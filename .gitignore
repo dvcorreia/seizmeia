@@ -4,6 +4,9 @@ bin/
 config.yaml
 config.yml
 
+# Direnv
+/.direnv/
+
 # Binaries for programs and plugins
 *.exe
 *.exe~

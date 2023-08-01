@@ -7,8 +7,10 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/dvcorreia/seizmeia/internal/platform/buildinfo"
+	"github.com/dvcorreia/seizmeia/web"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 
@@ -118,7 +120,9 @@ func main() { //nolint:funlen,gocyclo
 		r.Use(middleware.RequestID)
 		r.Use(middleware.Recoverer)
 
-		r.Mount("/buildinfo", buildinfo.HTTPHandler(buildInfo))
+		r.Mount("/api/buildinfo", buildinfo.HTTPHandler(buildInfo))
+
+		r.NotFound(web.SPAHandler)
 
 		httpServer := http.Server{
 			Addr:    ":8000",
@@ -128,7 +132,11 @@ func main() { //nolint:funlen,gocyclo
 		// Close server on context cancelation
 		errg.Go(func() error {
 			<-ctx.Done()
-			if err := httpServer.Shutdown(context.Background()); err != nil {
+
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+
+			if err := httpServer.Shutdown(ctx); err != nil {
 				logger.Error("could not close server", "err", err)
 			}
 			return nil

@@ -1,5 +1,5 @@
 NAME ?= seizmeia
-DESCRIPTION ?= A credit management tool for a beer tap
+DESCRIPTION ?= A credit management tool for a beer tap.
 
 VERSION ?= $(shell git describe --tags --exact-match 2>/dev/null || git symbolic-ref -q --short HEAD)
 COMMIT_HASH ?= $(shell git rev-parse --short HEAD 2>/dev/null)
@@ -37,12 +37,36 @@ coverage:
 	@go tool cover -func cover.out
 
 .PHONY: lint
-lint:
+lint: ## lint code
 	@golangci-lint run ./...
-lint.podman:
+lint-podman:
 	podman build --target lint -f tools/Dockerfile --tag $(NAME):$(VERSION)-lint .
 	podman run $(NAME):$(VERSION)-lint
 
+##@ Clean
+clean: ## Delete all builds and downloaded dependencies.
+	@rm -rf bin/
+
+FORMATTING_BEGIN_YELLOW = \033[0;33m
+FORMATTING_BEGIN_BLUE = \033[36m
+FORMATTING_END = \033[0m
+
 .PHONY: help
-help: ## shows this help
-	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make \033[36m\033[0m\n"} /^[$$()% a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+help:
+	@printf -- "${FORMATTING_BEGIN_BLUE}%s${FORMATTING_END}\n" \
+	"" \
+	"  .~~~~.                                                      " \
+	"  i====i_                                                     " \
+	"  |cccc|_)                                                    " \
+	"  |cccc|   Seizmeia: A credit management tool for a beer tap  " \
+	"  \`-==-'                                                     " \
+	"" \
+	"--------------------------------------------------------------" \
+	""
+	@awk 'BEGIN {\
+	    FS = ":.*##"; \
+	    printf                "Usage: ${FORMATTING_BEGIN_BLUE}OPTION${FORMATTING_END}=<value> make ${FORMATTING_BEGIN_YELLOW}<target>${FORMATTING_END}\n"\
+	  } \
+	  /^[a-zA-Z0-9_-]+:.*?##/ { printf "  ${FORMATTING_BEGIN_BLUE}%-46s${FORMATTING_END} %s\n", $$1, $$2 } \
+	  /^.?.?##~/              { printf "   %-46s${FORMATTING_BEGIN_YELLOW}%-46s${FORMATTING_END}\n", "", substr($$1, 6) } \
+	  /^##@/                  { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
