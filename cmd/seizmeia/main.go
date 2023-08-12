@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/dvcorreia/seizmeia/internal/auth"
 	"github.com/dvcorreia/seizmeia/internal/platform/buildinfo"
 	"github.com/dvcorreia/seizmeia/web"
 	"github.com/go-chi/chi"
@@ -108,6 +110,24 @@ func main() { //nolint:funlen,gocyclo
 
 	errg, ctx := errgroup.WithContext(ctx)
 
+	// Set up authentication
+	authenticator, err := auth.New(auth.WithOptions(auth.Options{
+		ClientID:     "seizmeia-app",
+		ClientSecret: "ZXhhbXBsZS1hcHAtc2VjcmV0",
+		IssuerURL:    "http://127.0.0.1:5556/dex",
+		RedirectURI:  "http://127.0.0.1:5555/callback",
+	}))
+	if err != nil {
+		logger.Error("could not create authenticator", "err", err)
+		return
+	}
+
+	if u, err := url.Parse("http://127.0.0.1:5555/callback"); err != nil {
+		logger.Error("bad spa redirect URI", "err", err)
+	} else {
+		authenticator.SpaRedirectURI = *u
+	}
+
 	// Set up http public API server
 	{
 		logger := logger.With(
@@ -122,10 +142,13 @@ func main() { //nolint:funlen,gocyclo
 
 		r.Mount("/api/buildinfo", buildinfo.HTTPHandler(buildInfo))
 
+		r.Get("/login", authenticator.HandleRedirect)
+		r.HandleFunc(authenticator.SpaRedirectURI.Path, authenticator.HandleOAuth2Callback)
+
 		r.NotFound(web.SPAHandler)
 
 		httpServer := http.Server{
-			Addr:    ":8000",
+			Addr:    ":5555",
 			Handler: r,
 		}
 

@@ -6,7 +6,7 @@ import Root from './routes/root'
 
 const router = createBrowserRouter([
   { path: "/", element: <Root /> },
-  { path: "/callback", element: <div>Callback</div> },
+  { path: "/loggedin", element: <div>Logged in with cookie: {document.cookie}</div> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
