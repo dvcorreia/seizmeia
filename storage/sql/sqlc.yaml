@@ -1,0 +1,17 @@
+version: 2
+
+sql:
+  - schema: migrations
+    queries: queries
+    engine: sqlite
+    gen:
+      go:
+        package: sqlite
+        out: sqlite
+  - schema: migrations
+    queries: queries
+    engine: postgresql
+    gen:
+      go:
+        package: postgres
+        out: postgres
