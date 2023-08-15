@@ -122,8 +122,9 @@ func main() { //nolint:funlen,gocyclo
 		return
 	}
 
-	if u, err := url.Parse("http://127.0.0.1:5555/callback"); err != nil {
+	if u, err := url.Parse("http://127.0.0.1:5555/loggedin"); err != nil {
 		logger.Error("bad spa redirect URI", "err", err)
+		return
 	} else {
 		authenticator.SpaRedirectURI = *u
 	}
@@ -143,7 +144,7 @@ func main() { //nolint:funlen,gocyclo
 		r.Mount("/api/buildinfo", buildinfo.HTTPHandler(buildInfo))
 
 		r.Get("/login", authenticator.HandleRedirect)
-		r.HandleFunc(authenticator.SpaRedirectURI.Path, authenticator.HandleOAuth2Callback)
+		r.HandleFunc("/callback", authenticator.HandleOAuth2Callback)
 
 		r.NotFound(web.SPAHandler)
 

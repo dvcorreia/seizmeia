@@ -108,6 +108,8 @@ func (a *authenticator) HandleOAuth2Callback(w http.ResponseWriter, r *http.Requ
 		Value:    rawIDToken,
 		Path:     "/",
 		SameSite: http.SameSiteStrictMode,
+		// HttpOnly: true,
+		Secure: true, // TODO: set this to true on HTTPS
 	}
 
 	http.SetCookie(w, cookie)
