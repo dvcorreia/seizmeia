@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+    seizmeia:
+        container_name: seizmeia
+        command: python -m seizmeia
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: dev
+        volumes:
+            - ./seizmeia/:/usr/src/app/seizmeia
+        ports:
+        - "80:80"

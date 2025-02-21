@@ -2,21 +2,50 @@
 
 <div align="center">
 <p>A credit management tool for a beer tap</p>
-<p><i>🚧 This repository is a work in progress and not ready for production.</i></p>
 </div>
 
-## Gettings started
+## Getting Started
 
-Run Dex OIDC for authentication:
+Clone the repository:
 
-```console
-dex serve examples/dex.dev.yaml
+```bash
+git clone https://github.com/seizmeia/seizmeia.git
 ```
 
-## References
+### Setup environment
 
-Authorization:
+Make sure you have `tox` installed in your system python and:
 
-- [Dex documentation](https://dexidp.io/docs/)
-- [The insecurity of OAuth 2.0 in frontends - Philippe de Ryck - NDC Security 2023](https://youtu.be/OpFN6gmct8c)
-- [Securing SPAs and Blazor Applications using the BFF (Backend for Frontend) Pattern - Dominick Baier](https://youtu.be/hWJuX-8Ur2k)
+```bash
+make env
+```
+
+### Run locally
+
+Run:
+
+```bash
+make run
+```
+
+### Run with Docker Compose
+
+To run the application:
+
+```bash
+make bup
+```
+
+To see it work:
+
+```bash
+curl localhost:8000
+```
+
+The application will autoreload on `/seizmeia` changes.
+
+To stop the application:
+
+```bash
+make down
+```

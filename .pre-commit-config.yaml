@@ -1,0 +1,83 @@
+repos:
+  # runs some verification hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-json
+        exclude: (.vscode|.devcontainer)
+
+      - id: no-commit-to-branch
+        args:
+          - --branch=dev
+          - --branch=master
+          - --branch=main
+
+      - id: trailing-whitespace
+        files: ^(seizmeia|tests)/.+\.py$
+
+      - id: end-of-file-fixer
+        files: ^(seizmeia|tests)/.+\.py$
+
+      - id: check-yaml
+        exclude: .gitlab-ci.yml
+      - id: check-added-large-files
+      - id: debug-statements
+        files: ^(seizmeia|tests)/.+\.py$
+
+      - id: requirements-txt-fixer
+
+  # converts code to newer python syntax
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.3.1
+    hooks:
+      - id: pyupgrade
+        args: [--py310-plus]
+
+  # formats code
+  - repo: https://github.com/psf/black
+    rev: 23.1.0
+    hooks:
+      - id: black
+        args:
+          - --safe
+          - --quiet
+          - --line-length=79
+        files: ^((seizmeia|tests)/.+)?[^/]+\.py$
+
+  # manages imports
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: ["--profile", "black", -a, "from __future__ import annotations"]
+
+  # check for any code spell mistakes
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.4
+    hooks:
+      - id: codespell
+        args:
+          - --ignore-words-list=seizmeia
+          - --skip="./.*,*.csv,*.json"
+          - --quiet-level=2
+        exclude_types: [csv, json]
+  
+  # checks code formating
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.0.259
+    hooks:
+      - id: ruff
+
+  # checks setup.cfg formating
+  - repo: https://github.com/asottile/setup-cfg-fmt
+    rev: v2.2.0
+    hooks:
+      - id: setup-cfg-fmt
+
+  # check for type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.1.1
+    hooks:
+    - id: mypy
+      additional_dependencies: [types-PyYAML>=6.0.12.8]
